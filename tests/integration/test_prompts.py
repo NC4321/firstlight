@@ -41,6 +41,13 @@ def test_invalid_prompt_answer_reasks(runner: CliRunner, tmp_path: Path, monkeyp
     assert (tmp_path / "demo-app").exists()
 
 
+def test_eof_mid_prompt_aborts_cleanly(runner: CliRunner, tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    result = runner.invoke(app, ["new", "demo-app"], input="python\n")  # EOF at license prompt
+    assert result.exit_code != 0
+    assert not (tmp_path / "demo-app").exists()
+
+
 @pytest.mark.parametrize("command", [["config", "show"], ["config", "path"]])
 def test_config_readonly_commands(runner: CliRunner, command: list[str]) -> None:
     result = runner.invoke(app, command)
