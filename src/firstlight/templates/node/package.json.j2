@@ -5,7 +5,13 @@
   {% if has_license %}
   "license": "{{ license_display }}",
   {% endif %}
+  {% if author and email %}
   "author": "{{ author }} <{{ email }}>",
+  {% elif author %}
+  "author": "{{ author }}",
+  {% elif email %}
+  "author": "<{{ email }}>",
+  {% endif %}
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

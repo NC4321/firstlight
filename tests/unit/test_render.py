@@ -1,3 +1,5 @@
+import json
+import tomllib
 from importlib.resources import files
 
 import pytest
@@ -75,3 +77,53 @@ def test_actions_expressions_survive() -> None:
 def test_template_dirs_ship_with_package(stack_id: str) -> None:
     template_dir = files("firstlight") / "templates" / STACKS[stack_id].template_dir
     assert any(template_dir.iterdir())
+
+
+# A machine with no `git config user.name`/`user.email` (a fresh checkout, a CI
+# runner) leaves author and email empty. Metadata must stay valid: hatchling
+# rejects an author entry that specifies neither name nor email.
+@pytest.mark.parametrize(
+    ("author", "email"),
+    [
+        ("Test Author", "test@example.com"),
+        ("Test Author", ""),
+        ("", "test@example.com"),
+        ("", ""),
+    ],
+)
+def test_author_metadata_is_valid_for_every_identity(author: str, email: str) -> None:
+    py = render_project(make_context(stack_id="python", author=author, email=email))
+    pyproject = next(e for e in py.files if e.path == "pyproject.toml")
+    authors = tomllib.loads(pyproject.content)["project"].get("authors", [])
+    assert all(entry.get("name") or entry.get("email") for entry in authors)
+    assert bool(authors) == bool(author or email)
+
+    node = render_project(make_context(stack_id="node", author=author, email=email))
+    package_json = next(e for e in node.files if e.path == "package.json")
+    parsed = json.loads(package_json.content)
+    assert parsed.get("author", "").strip(" <>") != "" or not (author or email)
+
+
+@pytest.mark.parametrize(
+    ("author", "github_user", "expected"),
+    [
+        ("Test Author", "tester", "Test Author"),
+        ("", "tester", "tester"),
+        ("Test Author", "", "Test Author"),
+    ],
+)
+def test_license_copyright_falls_back_to_github_user(
+    author: str, github_user: str, expected: str
+) -> None:
+    for license_id in ("mit", "apache-2.0"):
+        plan = render_project(
+            make_context(license_id=license_id, author=author, github_user=github_user)
+        )
+        license_file = next(e for e in plan.files if e.path == "LICENSE")
+        # Match the copyright notice itself, not Apache's "Grant of Copyright License" heading.
+        line = next(
+            ln.strip()
+            for ln in license_file.content.splitlines()
+            if ln.strip().startswith("Copyright")
+        )
+        assert line.endswith(expected), (license_id, line)

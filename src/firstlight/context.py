@@ -34,6 +34,16 @@ class ProjectContext:
     def has_license(self) -> bool:
         return self.license_id != "none"
 
+    @property
+    def copyright_holder(self) -> str:
+        """Name for the license copyright line.
+
+        Falls back to the GitHub username when no author is known (no git identity
+        configured and nothing saved in the user config), so a license is never
+        issued to a blank holder.
+        """
+        return self.author or self.github_user
+
     def template_vars(self) -> dict[str, object]:
         return {
             "project_name": self.project_name,
@@ -44,6 +54,7 @@ class ProjectContext:
             "license_display": self.license_display,
             "has_license": self.has_license,
             "author": self.author,
+            "copyright_holder": self.copyright_holder,
             "email": self.email,
             "year": self.year,
             "github_user": self.github_user,

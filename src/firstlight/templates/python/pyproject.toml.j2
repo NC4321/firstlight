@@ -12,7 +12,13 @@ license = "{{ license_display }}"
 license-files = ["LICENSE"]
 {% endif %}
 requires-python = ">=3.11"
+{% if author and email %}
 authors = [{ name = "{{ author }}", email = "{{ email }}" }]
+{% elif author %}
+authors = [{ name = "{{ author }}" }]
+{% elif email %}
+authors = [{ email = "{{ email }}" }]
+{% endif %}
 dependencies = []
 
 [project.optional-dependencies]
