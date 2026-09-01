@@ -12,7 +12,7 @@ import typer
 from rich.markup import escape
 from rich.panel import Panel
 
-from firstlight import prompts
+from firstlight import gitops, prompts
 from firstlight.config import load_config
 from firstlight.console import console, err_console
 from firstlight.context import LICENSES, ProjectContext, derive_package_name
@@ -43,6 +43,17 @@ def new(
         bool | None,
         typer.Option("--pre-commit/--no-pre-commit", help="Include a pre-commit config."),
     ] = None,
+    git: Annotated[
+        bool | None,
+        typer.Option("--git/--no-git", help="Initialize a git repo with a first commit."),
+    ] = None,
+    github: Annotated[
+        bool | None,
+        typer.Option("--github/--no-github", help="Create a GitHub repo via the gh CLI."),
+    ] = None,
+    public: Annotated[
+        bool, typer.Option("--public", help="Make the GitHub repo public (default: private).")
+    ] = False,
     no_input: Annotated[
         bool, typer.Option("--no-input", help="Never prompt; use flags, config, and defaults.")
     ] = False,
@@ -85,6 +96,13 @@ def new(
     if pre_commit is None:
         pre_commit = prompts.prompt_pre_commit() if interactive else False
 
+    if git is None:
+        git = prompts.prompt_git() if interactive else True
+    if github is None:
+        github = prompts.prompt_github() if interactive and git else False
+    if github and not git:
+        raise _fail("--github requires --git (a repo is needed before pushing to GitHub).")
+
     git_name, git_email = get_git_identity()
     ctx = ProjectContext(
         project_name=name,
@@ -96,8 +114,8 @@ def new(
         email=config.email or git_email,
         year=datetime.datetime.now(tz=datetime.UTC).year,
         github_user=config.github_user,
-        use_git=False,
-        use_github=False,
+        use_git=git,
+        use_github=github,
         use_pre_commit=pre_commit,
     )
     plan = render_project(ctx)
@@ -113,5 +131,9 @@ def new(
         raise _fail(str(exc)) from exc
 
     console.print(f"[bold green]✨ created[/bold green] {root}")
+
+    if git and gitops.init_repo(root) and github:
+        gitops.create_github_repo(root, name, public=public)
+
     steps = "\n".join(escape(step.format(name=name)) for step in STACKS[stack].next_steps)
     console.print(Panel(steps, title="next steps", border_style="green", title_align="left"))

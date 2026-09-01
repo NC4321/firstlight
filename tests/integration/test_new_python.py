@@ -24,7 +24,8 @@ EXPECTED_PYTHON_FILES = {
 def scaffolded(runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(
-        app, ["new", "demo-app", "--stack", "python", "--license", "mit", "--no-input"]
+        app,
+        ["new", "demo-app", "--stack", "python", "--license", "mit", "--no-input", "--no-git"],
     )
     assert result.exit_code == 0, result.output
     return tmp_path / "demo-app"

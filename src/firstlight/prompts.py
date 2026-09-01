@@ -30,3 +30,11 @@ def prompt_description(project_name: str) -> str:
 
 def prompt_pre_commit() -> bool:
     return typer.confirm("Include pre-commit config?", default=False)
+
+
+def prompt_git() -> bool:
+    return typer.confirm("Initialize git repo with first commit?", default=True)
+
+
+def prompt_github() -> bool:
+    return typer.confirm("Create GitHub repo (via gh)?", default=False)
