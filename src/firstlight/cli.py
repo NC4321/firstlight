@@ -3,17 +3,17 @@
 from typing import Annotated
 
 import typer
-from rich.console import Console
 
 from firstlight import __version__
+from firstlight.commands.new import new
+from firstlight.console import console
 
 app = typer.Typer(
     name="firstlight",
     help="Scaffold a new project — structure, README, license, CI, git — in one command.",
     no_args_is_help=True,
 )
-console = Console()
-err_console = Console(stderr=True)
+app.command()(new)
 
 
 def _version_callback(value: bool) -> None:
