@@ -11,7 +11,9 @@
 license, `.gitignore`, a working CI pipeline, a git repo with a first commit —
 even the GitHub remote. For **Python**, **Node/TypeScript**, or **Go**.
 
-<!-- demo.gif goes here: `vhs demo.tape` regenerates it -->
+![firstlight scaffolding a Python project](demo.gif)
+
+<sub>Regenerate with `vhs demo.tape`.</sub>
 
 ## The problem
 

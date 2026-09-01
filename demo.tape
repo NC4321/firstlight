@@ -2,8 +2,8 @@
 Output demo.gif
 
 Set FontSize 12
-Set Width 600
-Set Height 400
+Set Width 860
+Set Height 420
 Set Theme "Catppuccin Mocha"
 Set TypingSpeed 40ms
 
