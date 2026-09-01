@@ -5,6 +5,7 @@ from typing import Annotated
 import typer
 
 from firstlight import __version__
+from firstlight.commands.config import config_app
 from firstlight.commands.new import new
 from firstlight.console import console
 
@@ -14,6 +15,7 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 app.command()(new)
+app.add_typer(config_app, name="config")
 
 
 def _version_callback(value: bool) -> None:

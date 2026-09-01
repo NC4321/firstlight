@@ -23,7 +23,9 @@ EXPECTED_PYTHON_FILES = {
 @pytest.fixture()
 def scaffolded(runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.chdir(tmp_path)
-    result = runner.invoke(app, ["new", "demo-app", "--stack", "python", "--license", "mit"])
+    result = runner.invoke(
+        app, ["new", "demo-app", "--stack", "python", "--license", "mit", "--no-input"]
+    )
     assert result.exit_code == 0, result.output
     return tmp_path / "demo-app"
 
@@ -57,19 +59,19 @@ def test_license_filled_in(scaffolded: Path) -> None:
 def test_existing_dir_fails_cleanly(runner: CliRunner, tmp_path: Path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     (tmp_path / "demo-app").mkdir()
-    result = runner.invoke(app, ["new", "demo-app"])
+    result = runner.invoke(app, ["new", "demo-app", "--no-input"])
     assert result.exit_code == 1
     assert "already exists" in result.output
 
 
 def test_bad_name_fails_cleanly(runner: CliRunner, tmp_path: Path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
-    result = runner.invoke(app, ["new", "Bad Name"])
+    result = runner.invoke(app, ["new", "Bad Name", "--no-input"])
     assert result.exit_code == 1
     assert not (tmp_path / "Bad Name").exists()
 
 
 def test_unknown_stack_fails(runner: CliRunner, tmp_path: Path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
-    result = runner.invoke(app, ["new", "demo", "--stack", "cobol"])
+    result = runner.invoke(app, ["new", "demo", "--stack", "cobol", "--no-input"])
     assert result.exit_code == 1
