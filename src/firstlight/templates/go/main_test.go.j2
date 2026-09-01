@@ -1,0 +1,13 @@
+package main
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestGreet(t *testing.T) {
+	got := Greet("world")
+	if !strings.Contains(got, "world") {
+		t.Errorf("Greet(%q) = %q, want it to contain %q", "world", got, "world")
+	}
+}

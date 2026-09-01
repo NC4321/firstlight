@@ -1,0 +1,13 @@
+// {{ project_name }}: {{ description }}
+package main
+
+import "fmt"
+
+// Greet returns a greeting for name.
+func Greet(name string) string {
+	return fmt.Sprintf("Hello from {{ project_name }}, %s!", name)
+}
+
+func main() {
+	fmt.Println(Greet("world"))
+}

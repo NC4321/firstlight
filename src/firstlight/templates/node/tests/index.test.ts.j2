@@ -1,0 +1,7 @@
+import { expect, test } from "vitest";
+
+import { greet } from "../src/index.js";
+
+test("greet includes the name", () => {
+  expect(greet("world")).toContain("world");
+});

@@ -25,5 +25,25 @@ STACKS: dict[str, Stack] = {
                 "pytest",
             ),
         ),
+        Stack(
+            id="node",
+            display="Node/TypeScript",
+            template_dir="node",
+            next_steps=(
+                "cd {name}",
+                "npm install",
+                "npm test",
+            ),
+        ),
+        Stack(
+            id="go",
+            display="Go",
+            template_dir="go",
+            next_steps=(
+                "cd {name}",
+                "go mod tidy",
+                "go test ./...",
+            ),
+        ),
     )
 }
